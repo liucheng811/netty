@@ -159,6 +159,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
         final ChannelHandler currentChildHandler = childHandler;
         final Entry<ChannelOption<?>, Object>[] currentChildOptions;
         final Entry<AttributeKey<?>, Object>[] currentChildAttrs;
+        //LinkedHashMap非线程安全 使用同步处理
         synchronized (childOptions) {
             currentChildOptions = childOptions.entrySet().toArray(newOptionArray(0));
         }

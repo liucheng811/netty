@@ -58,6 +58,8 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
         this(nThreads, executor, DefaultEventExecutorChooserFactory.INSTANCE, args);
     }
 
+
+
     /**
      * Create a new instance.
      *
@@ -66,16 +68,22 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
      * @param chooserFactory    the {@link EventExecutorChooserFactory} to use.
      * @param args              arguments which will passed to each {@link #newChild(Executor, Object...)} call
      */
+    // 1.默认0，2executor 默认null， 3.nio provider，4.new DefaultSelectStrategyFactory() 是个单例，5.默认拒绝策略：抛出异常
+    // args : 3-5, 线程数默认: NettyRuntime.availableProcessors() * 2，也就是 CPU core * 2
+    // 1.默认 core *2， 2.null， 3. 单例new DefaultEventExecutorChooserFactory()， 4， 3-5
     protected MultithreadEventExecutorGroup(int nThreads, Executor executor,
                                             EventExecutorChooserFactory chooserFactory, Object... args) {
         if (nThreads <= 0) {
             throw new IllegalArgumentException(String.format("nThreads: %d (expected: > 0)", nThreads));
         }
-
+        //创建线程池
         if (executor == null) {
+            // 类名为名称的线程工厂
+            // 该线程池没有任何队列，提交任务后，创建任何线程类型都是 FastThreadLocalRunnable（根据Factory）, 并且立即start。
             executor = new ThreadPerTaskExecutor(newDefaultThreadFactory());
         }
 
+        // 创建事件执行组
         children = new EventExecutor[nThreads];
 
         for (int i = 0; i < nThreads; i ++) {
